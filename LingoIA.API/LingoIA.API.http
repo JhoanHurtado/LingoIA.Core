@@ -1,0 +1,6 @@
+@LingoIA.API_HostAddress = http://localhost:5144
+
+GET {{LingoIA.API_HostAddress}}
+Accept: application/json
+
+###

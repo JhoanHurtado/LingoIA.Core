@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "O9giKZrMGkA4aEbBlSp7FvYu28nP7zexaWlShUjztRE=",
+  "Source": "LingoIA.API",
+  "BasePath": "_content/LingoIA.API",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

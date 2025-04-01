@@ -1,0 +1,17 @@
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Application.deps.json
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Application.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Application.pdb
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Domain.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Infrastructure.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Domain.pdb
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/bin/Debug/net9.0/LingoIA.Infrastructure.pdb
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.csproj.AssemblyReference.cache
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.AssemblyInfoInputs.cache
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.AssemblyInfo.cs
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.csproj.CoreCompileInputs.cache
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA..7FA26001.Up2Date
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/refint/LingoIA.Application.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.pdb
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/ref/LingoIA.Application.dll

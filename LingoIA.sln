@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LingoIA.API", "LingoIA.API\LingoIA.API.csproj", "{FEDCBD63-A914-48D9-8498-ADF40E5F2F59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LingoIA.Application", "LingoIA.Application\LingoIA.Application.csproj", "{3FDBD4E3-98BB-4D79-991C-E3313855F023}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LingoIA.Domain", "LingoIA.Domain\LingoIA.Domain.csproj", "{DC8312A8-3250-425E-8914-583612DD8892}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LingoIA.Infrastructure", "LingoIA.Infrastructure\LingoIA.Infrastructure.csproj", "{AFBEDDD7-8AC2-41D0-8D4E-B5FA612132BB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29E0F1D0-5013-4319-B15C-95591B771D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29E0F1D0-5013-4319-B15C-95591B771D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29E0F1D0-5013-4319-B15C-95591B771D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29E0F1D0-5013-4319-B15C-95591B771D61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEDCBD63-A914-48D9-8498-ADF40E5F2F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEDCBD63-A914-48D9-8498-ADF40E5F2F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEDCBD63-A914-48D9-8498-ADF40E5F2F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEDCBD63-A914-48D9-8498-ADF40E5F2F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FDBD4E3-98BB-4D79-991C-E3313855F023}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDBD4E3-98BB-4D79-991C-E3313855F023}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDBD4E3-98BB-4D79-991C-E3313855F023}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDBD4E3-98BB-4D79-991C-E3313855F023}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC8312A8-3250-425E-8914-583612DD8892}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8312A8-3250-425E-8914-583612DD8892}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC8312A8-3250-425E-8914-583612DD8892}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC8312A8-3250-425E-8914-583612DD8892}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFBEDDD7-8AC2-41D0-8D4E-B5FA612132BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBEDDD7-8AC2-41D0-8D4E-B5FA612132BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBEDDD7-8AC2-41D0-8D4E-B5FA612132BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBEDDD7-8AC2-41D0-8D4E-B5FA612132BB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
