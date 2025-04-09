@@ -162,3 +162,4 @@
 /LingoIA.Infrastructure/obj/Release/net9.0/LingoIA.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 /LingoIA.Infrastructure/obj/Release/net9.0/LingoIA.Infrastructure.GlobalUsings.g.cs
 /.vs/LingoIA/CopilotIndices/17.14.260.54502
+*.vsidx
