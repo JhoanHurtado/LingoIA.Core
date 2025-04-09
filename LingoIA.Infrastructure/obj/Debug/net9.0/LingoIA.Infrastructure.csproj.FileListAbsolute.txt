@@ -15,3 +15,4 @@
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Infrastructure/obj/Debug/net9.0/LingoIA.Infrastructure.pdb
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Infrastructure/obj/Debug/net9.0/LingoIA.Infrastructure.genruntimeconfig.cache
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Infrastructure/obj/Debug/net9.0/ref/LingoIA.Infrastructure.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Infrastructure/obj/Debug/net9.0/LingoIA.Infrastructure.sourcelink.json

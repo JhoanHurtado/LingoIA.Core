@@ -147,3 +147,4 @@
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.API/obj/Debug/net9.0/ref/LingoIA.API.dll
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.API/bin/Debug/net9.0/Newtonsoft.Json.dll
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.API/bin/Debug/net9.0/System.Net.WebSockets.WebSocketProtocol.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.API/obj/Debug/net9.0/LingoIA.API.sourcelink.json

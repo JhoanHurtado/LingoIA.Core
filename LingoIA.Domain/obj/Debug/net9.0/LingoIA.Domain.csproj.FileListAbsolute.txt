@@ -10,3 +10,4 @@
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Domain/obj/Debug/net9.0/refint/LingoIA.Domain.dll
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Domain/obj/Debug/net9.0/LingoIA.Domain.pdb
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Domain/obj/Debug/net9.0/ref/LingoIA.Domain.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Domain/obj/Debug/net9.0/LingoIA.Domain.sourcelink.json

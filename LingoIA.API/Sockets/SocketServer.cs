@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using LingoIA.Application.Dtos;
 using LingoIA.Application.Interfaces;
 using LingoIA.Domain.models;
 
@@ -37,6 +39,7 @@ namespace LingoIA.API.Sockets
             string request = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
             var parts = request.Split('|', 2);
+            var message = JsonSerializer.Deserialize<MessageDto>(request);
             if (parts.Length < 2)
             {
                 await stream.WriteAsync(Encoding.UTF8.GetBytes("Formato incorrecto"));

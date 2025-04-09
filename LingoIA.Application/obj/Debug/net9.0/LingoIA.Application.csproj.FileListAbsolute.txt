@@ -15,3 +15,4 @@
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/refint/LingoIA.Application.dll
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.pdb
 /Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/ref/LingoIA.Application.dll
+/Users/jhoanhurtado/Documents/NetFramework/LingoIA.Application/obj/Debug/net9.0/LingoIA.Application.sourcelink.json

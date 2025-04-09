@@ -15,9 +15,9 @@ namespace LingoIA.Application.Hubs
 
     public class ChatHub : Hub
     {
-        public async Task SendMessage(ChatMessage message)
+        public async Task SendMessage(MessageDto message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", message.User, message.Message);
+            await Clients.All.SendAsync("ReceiveMessage", message.User, message.Text);
         }
     }
 }
