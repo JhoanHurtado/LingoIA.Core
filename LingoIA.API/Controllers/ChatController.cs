@@ -1,3 +1,4 @@
+using LingoIA.Application.Dtos;
 using LingoIA.Application.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -16,9 +17,9 @@ namespace LingoIA.API.Controllers
         }
 
         [HttpPost("send")] // Endpoint para enviar mensaje por API
-        public async Task<IActionResult> SendMessage([FromBody] ChatMessage message)
+        public async Task<IActionResult> SendMessage([FromBody] MessageDto message)
         {
-            await _chatHub.Clients.All.SendAsync("ReceiveMessage", message.User, message.Message);
+            await _chatHub.Clients.All.SendAsync("ReceiveMessage", message.User, message.Text);
             return Ok(new { status = "Message sent" });
         }
     }
