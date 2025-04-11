@@ -1,3 +1,4 @@
+using LingoIA.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,10 +17,11 @@ namespace LingoIA.Domain.Entities
         public Guid UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public User User { get; set; } = null!; // Relación con la tabla User
+        public User User { get; set; } = null!;
 
         [Required]
         public string Phrase { get; set; } = string.Empty;
+        public LearningType Type { get; set; } = LearningType.Grammar;
 
         [Required]
         public string Correction { get; set; } = string.Empty;

@@ -33,5 +33,43 @@ namespace LingoIA.Application.Utils
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public static ClaimsPrincipal? ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(SecretKey);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = "LingoIA",
+                ValidateAudience = true,
+                ValidAudience = "LingoIAUsers",
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                return principal;
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                Console.WriteLine("Token expirado.");
+            }
+            catch (SecurityTokenException)
+            {
+                Console.WriteLine("Token inválido.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al validar el token: {ex.Message}");
+            }
+
+            return null;
+        }
     }
 }

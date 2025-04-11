@@ -27,6 +27,12 @@ namespace LingoIA.Domain.Entities
         [Column(TypeName = "numeric(5,2)")]
         public decimal Score { get; set; }
 
+        [MaxLength(100)]
+        public string? MispronouncedWord { get; set; }
+
+        [Column(TypeName = "text")]
+        public string? AssistantResponse { get; set; }
+
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         // Relación con Conversation

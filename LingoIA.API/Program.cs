@@ -4,6 +4,7 @@ using LingoIA.Application.Interfaces;
 using LingoIA.Application.Mappings;
 using LingoIA.Application.Services;
 using LingoIA.Application.Services.LanguageTool;
+using LingoIA.Domain.Interfaces;
 using LingoIA.Infrastructure.Interfaces;
 using LingoIA.Infrastructure.Persistence;
 using LingoIA.Infrastructure.Repositories;
@@ -23,10 +24,13 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
+builder.Services.AddScoped<ILingoIAClient>(provider =>
+    new LingoIAClient("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", "Frank")); // O usar `IOptions` si prefieres
+
+builder.Services.AddScoped<ILanguagePracticeService, LanguagePracticeService>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<ITextCorrectionService, TextCorrectionService>();
-builder.Services.AddScoped<ILanguageToolApiClient, LanguageToolApiClient>();
 
 
 // 📌 Registrar el servidor de sockets

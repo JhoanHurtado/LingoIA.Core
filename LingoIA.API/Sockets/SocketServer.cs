@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using LingoIA.Application.Dtos;
 using LingoIA.Application.Interfaces;
+using LingoIA.Domain.Enums;
 using LingoIA.Domain.models;
 
 namespace LingoIA.API.Sockets
@@ -18,47 +19,94 @@ namespace LingoIA.API.Sockets
             _serviceProvider = serviceProvider;
         }
 
-        public async Task StartAsync()
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             TcpListener server = new TcpListener(IPAddress.Any, Port);
             server.Start();
-            Console.WriteLine($"Servidor iniciado en el puerto {Port}...");
+            Console.WriteLine($"✅ Servidor iniciado en el puerto {Port}...");
 
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 TcpClient client = await server.AcceptTcpClientAsync();
                 _ = Task.Run(() => HandleClient(client));
             }
+
+            server.Stop();
+            Console.WriteLine("🛑 Servidor detenido.");
         }
 
         private async Task HandleClient(TcpClient client)
         {
-            using NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead = await stream.ReadAsync(buffer);
-            string request = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-            var parts = request.Split('|', 2);
-            var message = JsonSerializer.Deserialize<MessageDto>(request);
-            if (parts.Length < 2)
+            try
             {
-                await stream.WriteAsync(Encoding.UTF8.GetBytes("Formato incorrecto"));
-                return;
+                using NetworkStream stream = client.GetStream();
+                byte[] buffer = new byte[4096];
+                int bytesRead = await stream.ReadAsync(buffer);
+
+                if (bytesRead == 0)
+                {
+                    Console.WriteLine("⚠ Cliente se desconectó sin enviar datos.");
+                    return;
+                }
+
+                string request = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine($"📥 Solicitud recibida: {request}");
+
+                var message = JsonSerializer.Deserialize<MessageDto>(request, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (message == null)
+                {
+                    Console.WriteLine("❌ No se pudo deserializar el mensaje.");
+                    return;
+                }
+
+                using var scope = _serviceProvider.CreateScope();
+                var languagePracticeService = scope.ServiceProvider.GetRequiredService<ILanguagePracticeService>();
+
+                string responseIA;
+
+                if (message.ConversationId == null)
+                {
+                    responseIA = await languagePracticeService.StartConversationAsync("en", message.Text);
+                }
+                else
+                {
+                    responseIA = await languagePracticeService.SendMessageAsync(message.Text);
+                }
+
+                MessageAnalysis? result = languagePracticeService.GetLastAnalysis();
+
+
+                // Preparar mensaje de respuesta
+                message.CorrectedText = result?.Corrected;
+                message.Score = result!.Score;
+                message.CreatedAt = DateTime.UtcNow;
+                message.AssistantResponse = responseIA;
+                message.Explanation = result!.Explanation;
+                message.Sender = EnumSender.IA;
+
+                await SendResponseAsync(stream, message);
+
+                Console.WriteLine($"✅ [Recibido] {message.Text} -> [Corregido] {result.Corrected} | Score: {message.Score:F2}%");
             }
-
-            string language = parts[0].Trim();
-            string text = parts[1].Trim();
-
-            // 🔹 Crear un scope para obtener el servicio Scoped
-            using (var scope = _serviceProvider.CreateScope())
+            catch (Exception ex)
             {
-                var textCorrectionService = scope.ServiceProvider.GetRequiredService<ITextCorrectionService>();
-                CorrectionResult result = await textCorrectionService.CorrectTextAsync(text, language);
-
-                string response = $"Texto corregido: {result.CorrectedText}\nErrores:\n{string.Join("\n", result.Errors)}";
-                await stream.WriteAsync(Encoding.UTF8.GetBytes(response));
-                Console.WriteLine($"[Recibido] {text} -> [Corregido] {result.CorrectedText}");
+                Console.WriteLine($"🚨 Error en el manejo del cliente: {ex.Message}");
             }
+            finally
+            {
+                //client.Close();
+            }
+        }
+
+        private async Task SendResponseAsync(NetworkStream stream, object responseObj)
+        {
+            string json = JsonSerializer.Serialize(responseObj);
+            byte[] data = Encoding.UTF8.GetBytes(json);
+            await stream.WriteAsync(data);
         }
     }
 }

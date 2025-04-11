@@ -163,3 +163,5 @@
 /LingoIA.Infrastructure/obj/Release/net9.0/LingoIA.Infrastructure.GlobalUsings.g.cs
 /.vs/LingoIA/CopilotIndices/17.14.260.54502
 *.vsidx
+/LingoIA.Infrastructure/obj/Debug/net9.0/LingoIA.Infrastructure.sourcelink.json
+/LingoIA.Domain/obj/Debug/net9.0/LingoIA.Domain.sourcelink.json
