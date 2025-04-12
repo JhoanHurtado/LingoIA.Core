@@ -1,52 +1,64 @@
+using AutoMapper;
+using LingoIA.Application.Dtos;
+using LingoIA.Application.Interfaces;
+using LingoIA.Application.Services.ContractsServices;
+using LingoIA.Domain.Entities;
+using LingoIA.Domain.Enums;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using LingoIA.Application.Dtos;
-using LingoIA.Application.Interfaces;
-using LingoIA.Domain.Enums;
-using LingoIA.Domain.models;
 
-namespace LingoIA.API.Sockets
+public class SocketServer
 {
-    public class SocketServer
+    private readonly IServiceScopeFactory _scopeFactory;
+    private const int Port = 5050;
+    private List<Message> messages = new List<Message>();
+    private bool isNewChat = true;
+
+    public SocketServer(IServiceScopeFactory scopeFactory)
     {
-        private readonly IServiceProvider _serviceProvider;
-        private const int Port = 5050;
+        _scopeFactory = scopeFactory;
+    }
 
-        public SocketServer(IServiceProvider serviceProvider)
+    public async Task StartAsync(CancellationToken cancellationToken = default)
+    {
+        TcpListener server = new TcpListener(IPAddress.Any, Port);
+        server.Start();
+        Console.WriteLine($"✅ Servidor iniciado en el puerto {Port}...");
+
+        while (!cancellationToken.IsCancellationRequested)
         {
-            _serviceProvider = serviceProvider;
+            TcpClient client = await server.AcceptTcpClientAsync();
+            _ = Task.Run(() => HandleClientAsync(client));
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken = default)
+        server.Stop();
+        Console.WriteLine("🛑 Servidor detenido.");
+    }
+
+    private async Task HandleClientAsync(TcpClient client)
+    {
+        using var scope = _scopeFactory.CreateScope();
+
+        var authService = scope.ServiceProvider.GetRequiredService<IAuthContract>();
+        var conversationService = scope.ServiceProvider.GetRequiredService<IConversationService>();
+        var languagePracticeService = scope.ServiceProvider.GetRequiredService<ILanguagePracticeService>();
+        var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+
+        var stream = client.GetStream();
+        byte[] buffer = new byte[4096];
+
+        try
         {
-            TcpListener server = new TcpListener(IPAddress.Any, Port);
-            server.Start();
-            Console.WriteLine($"✅ Servidor iniciado en el puerto {Port}...");
-
-            while (!cancellationToken.IsCancellationRequested)
+            while (true)
             {
-                TcpClient client = await server.AcceptTcpClientAsync();
-                _ = Task.Run(() => HandleClient(client));
-            }
-
-            server.Stop();
-            Console.WriteLine("🛑 Servidor detenido.");
-        }
-
-        private async Task HandleClient(TcpClient client)
-        {
-            try
-            {
-                using NetworkStream stream = client.GetStream();
-                byte[] buffer = new byte[4096];
                 int bytesRead = await stream.ReadAsync(buffer);
 
                 if (bytesRead == 0)
                 {
-                    Console.WriteLine("⚠ Cliente se desconectó sin enviar datos.");
-                    return;
+                    Console.WriteLine("⚠ Cliente desconectado.");
+                    break;
                 }
 
                 string request = Encoding.UTF8.GetString(buffer, 0, bytesRead);
@@ -60,53 +72,102 @@ namespace LingoIA.API.Sockets
                 if (message == null)
                 {
                     Console.WriteLine("❌ No se pudo deserializar el mensaje.");
-                    return;
+                    continue;
                 }
 
-                using var scope = _serviceProvider.CreateScope();
-                var languagePracticeService = scope.ServiceProvider.GetRequiredService<ILanguagePracticeService>();
-
+                var user = await authService.getUserByIDAsync(message.User);
+                var conversationDTO = new ConversationDto();
                 string responseIA;
 
                 if (message.ConversationId == null)
                 {
-                    responseIA = await languagePracticeService.StartConversationAsync("en", message.Text);
+                    conversationDTO = new ConversationDto
+                    {
+                        Language = message.Language,
+                        Topic = "",
+                        UserId = message.User
+                    };
+
+                    var conversation = mapper.Map<Conversation>(conversationDTO);
+                    var newConversation = await conversationService.AddConversationAsync(conversation);
+                    conversationDTO.Id = newConversation.Id;
+
+                    responseIA = await languagePracticeService.StartConversationAsync(message.Language, message.Text, user?.Name ?? "Usuario");
                 }
                 else
                 {
-                    responseIA = await languagePracticeService.SendMessageAsync(message.Text);
+                    isNewChat = false;
+                    var conversation = await conversationService.GetConversationWithMessagesAsync((Guid)message.ConversationId);
+                    conversationDTO = mapper.Map<ConversationDto>(conversation.conversation);
+                    var _messageHistory = conversation.messages.Select(m => new Dictionary<string, string>
+                    {
+                        { "role", m.Role },
+                        { "content", m.Content }
+                    }).ToList();
+
+                    responseIA = await languagePracticeService.SendMessageAsync(message.Text, _messageHistory, user?.Name ?? "Usuario");
                 }
 
-                MessageAnalysis? result = languagePracticeService.GetLastAnalysis();
+                var result = languagePracticeService.GetLastAnalysis();
+                var conversationHistory = languagePracticeService.GetMessageHistory();
+                if (!isNewChat)
+                {
+                    var lastMessage = conversationHistory.LastOrDefault();
+                    messages = new List<Message>
+                    {
+                        new Message
+                        {
+                            Text = message.Text,
+                            Role = lastMessage["role"],
+                            Content = lastMessage["content"],
+                            Sender = EnumSender.User,
+                            ConversationId = conversationDTO.Id
+                        }
+                    };
 
+                }
+                else
+                {
+                    messages = conversationHistory.Select(msg => new Message
+                    {
+                        Text = message.Text,
+                        Role = msg["role"],
+                        Content = msg["content"],
+                        Sender = EnumSender.User,
+                        ConversationId = conversationDTO.Id
+                    }).ToList();
+                }
 
-                // Preparar mensaje de respuesta
-                message.CorrectedText = result?.Corrected;
-                message.Score = result!.Score;
+                await conversationService.AddMessageAsync(conversationDTO.Id, messages);
+
+                message.CorrectedText = result?.Corrected!;
+                message.Score = result?.Score ?? 0;
                 message.CreatedAt = DateTime.UtcNow;
                 message.AssistantResponse = responseIA;
-                message.Explanation = result!.Explanation;
+                message.Explanation = result?.Explanation!;
+                message.ConversationId = conversationDTO.Id;
                 message.Sender = EnumSender.IA;
 
                 await SendResponseAsync(stream, message);
 
-                Console.WriteLine($"✅ [Recibido] {message.Text} -> [Corregido] {result.Corrected} | Score: {message.Score:F2}%");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"🚨 Error en el manejo del cliente: {ex.Message}");
-            }
-            finally
-            {
-                //client.Close();
+                Console.WriteLine($"✅ [Recibido] {message.Text} -> [Corregido] {result?.Corrected} | Score: {message.Score:F2}%");
             }
         }
-
-        private async Task SendResponseAsync(NetworkStream stream, object responseObj)
+        catch (Exception ex)
         {
-            string json = JsonSerializer.Serialize(responseObj);
-            byte[] data = Encoding.UTF8.GetBytes(json);
-            await stream.WriteAsync(data);
+            Console.WriteLine($"🚨 Error en el manejo del cliente: {ex.Message}");
         }
+        finally
+        {
+            stream.Close();
+            client.Close();
+        }
+    }
+
+    private async Task SendResponseAsync(NetworkStream stream, object responseObj)
+    {
+        string json = JsonSerializer.Serialize(responseObj);
+        byte[] data = Encoding.UTF8.GetBytes(json);
+        await stream.WriteAsync(data, 0, data.Length);
     }
 }

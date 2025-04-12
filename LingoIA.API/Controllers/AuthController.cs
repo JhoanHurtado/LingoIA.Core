@@ -1,5 +1,6 @@
 using LingoIA.Application.Dtos;
 using LingoIA.Application.Services;
+using LingoIA.Application.Services.ContractsServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LingoIA.API.Controllers
@@ -8,9 +9,9 @@ namespace LingoIA.API.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-    private readonly AuthService _authService;
+    private readonly IAuthContract _authService;
 
-    public AuthController(AuthService authService)
+    public AuthController(IAuthContract authService)
     {
         _authService = authService;
     }

@@ -1,5 +1,6 @@
-﻿using LingoIA.Domain.Interfaces;
+﻿using LingoIA.Application.Interfaces;
 using LingoIA.Domain.models;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -9,33 +10,32 @@ namespace LingoIA.Infrastructure.Repositories
     public class LingoIAClient : ILingoIAClient
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiKey;
         private readonly string _assistantName = "LingoIA";
-        private readonly string _userName;
         private readonly string _apiUrl = "https://openrouter.ai/api/v1/chat/completions";
         private readonly List<Dictionary<string, string>> _messageHistory;
+
+        private readonly IConfiguration _configuration;
 
         private string _language = "english";
         private string _level = "intermediate";
         private MessageAnalysis? _lastAnalysis;
 
-        public LingoIAClient(string apiKey, string userName = "amigo")
+        public LingoIAClient(IConfiguration configuration)
         {
-            _apiKey = apiKey;
-            _userName = userName;
+            _configuration = configuration;
             _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration.GetSection("settingKey")["APIKey"]);
             _httpClient.DefaultRequestHeaders.Add("HTTP-Referer", "https://github.com/LingoIA-App");
             _httpClient.DefaultRequestHeaders.Add("X-Title", "LingoIA Language Assistant");
 
             _messageHistory = new List<Dictionary<string, string>>();
         }
 
-        public async Task<string> StartNewConversation(string language, string topic)
+        public async Task<string> StartNewConversation(string language, string topic, string username)
         {
             _messageHistory.Clear();
             _language = language.ToLower();
-            var systemPrompt = BuildSystemPrompt(language, _level);
+            var systemPrompt = BuildSystemPrompt(language, _level, username);
             _messageHistory.Add(new Dictionary<string, string>
             {
                 { "role", "system" },
@@ -43,18 +43,18 @@ namespace LingoIA.Infrastructure.Repositories
             });
 
             var prompt = _language == "spanish"
-                ? $"Inicia un diálogo sobre {topic} en español. Usa mi nombre ({_userName}) 2-3 veces naturalmente. Hazme 1 pregunta para continuar."
-                : $"Start a {topic} conversation in English. Use my name ({_userName}) 2-3 times naturally. Ask me 1 follow-up question.";
+                ? $"Inicia un diálogo sobre {topic} en español. Usa mi nombre ({username}) 2-3 veces naturalmente. Hazme 1 pregunta para continuar."
+                : $"Start a {topic} conversation in English. Use my name ({username}) 2-3 times naturally. Ask me 1 follow-up question.";
 
-            return await SendMessage(prompt);
+            return await SendMessage(prompt, _messageHistory, username);
         }
 
-        public async Task<string> SendMessage(string message)
+        public async Task<string> SendMessage(string message, List<Dictionary<string, string>> historyMessage, string username)
         {
             _messageHistory.Add(new Dictionary<string, string>
             {
                 { "role", "user" },
-                { "content", $"[Usuario: {_userName}] {message}" }
+                { "content", $"[Usuario: {username}] {message}" }
             });
 
             // Analizar automáticamente el mensaje del usuario
@@ -100,28 +100,29 @@ namespace LingoIA.Infrastructure.Repositories
         }
 
         public MessageAnalysis? GetLastAnalysis() => _lastAnalysis;
+        public List<Dictionary<string, string>> GetMessageHistory() => _messageHistory;
 
-        private string BuildSystemPrompt(string language, string proficiencyLevel)
+        private string BuildSystemPrompt(string language, string proficiencyLevel, string username)
         {
             return language.ToLower() switch
             {
                 "spanish" => $"""
-                Eres {_assistantName}, un asistente de idiomas. El usuario se llama {_userName}.
-                Ayuda a {_userName} a practicar español (nivel {proficiencyLevel}).
+                Eres {_assistantName}, un asistente de idiomas. El usuario se llama {username}.
+                Ayuda a {username} a practicar español (nivel {proficiencyLevel}).
 
                 Reglas:
-                1. Usa el nombre {_userName} naturalmente en la conversación
+                1. Usa el nombre {username} naturalmente en la conversación
                 2. Corrige errores señalándolos amablemente
                 3. Explica correcciones con ejemplos
                 4. Mantén un tono cálido y motivador
                 5. Firma siempre como "- {_assistantName}"
                 """,
                 _ => $"""
-                You are {_assistantName}, an English tutor. The user's name is {_userName}.
-                Help {_userName} practice {proficiencyLevel} level English.
+                You are {_assistantName}, an English tutor. The user's name is {username}.
+                Help {username} practice {proficiencyLevel} level English.
 
                 Rules:
-                1. Use {_userName}'s name naturally in conversation
+                1. Use {username}'s name naturally in conversation
                 2. Correct mistakes with gentle explanations
                 3. Provide clear examples
                 4. Keep a warm, encouraging tone
@@ -143,14 +144,14 @@ namespace LingoIA.Infrastructure.Repositories
                 - Número de errores gramaticales u ortográficos
                 - Versión corregida del texto
                 - Explicación de los errores
-                - Puntuación general del 0 al 10 según claridad, corrección y nivel de dificultad
+                - Puntuación general del 0.0 al 100.0 según claridad, corrección y nivel de dificultad
 
                 Devuélvelo en formato JSON:
                 {
                     "original": "...",
                     "corrected": "...",
                     "explanation": "...",
-                    "score": 0
+                    "score": 0.0
                 }
                 """,
                 _ => $$"""
@@ -162,14 +163,14 @@ namespace LingoIA.Infrastructure.Repositories
                 - Number of grammar or spelling mistakes
                 - Corrected version of the sentence
                 - Explanation of the mistakes
-                - Overall score from 0 to 10 (clarity, accuracy, difficulty)
+                - Overall score from 0.0 to 100.0 (clarity, accuracy, difficulty)
 
                 Return it in JSON format:
                 {
                     "original": "...",
                     "corrected": "...",
                     "explanation": "...",
-                    "score": 0
+                    "score": 0.0
                 }
                 """
             };

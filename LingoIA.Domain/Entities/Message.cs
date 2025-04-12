@@ -21,17 +21,19 @@ namespace LingoIA.Domain.Entities
         public required string Text { get; set; }
 
         [Column(TypeName = "text")]
-        public string? CorrectedText { get; set; }
+        public string CorrectedText { get; set; } = string.Empty;
 
         [Range(0, 10)]
         [Column(TypeName = "numeric(5,2)")]
-        public decimal Score { get; set; }
+        public decimal Score { get; set; } = 100;
 
         [MaxLength(100)]
         public string? MispronouncedWord { get; set; }
 
         [Column(TypeName = "text")]
-        public string? AssistantResponse { get; set; }
+        public string AssistantResponse { get; set; } = string.Empty;  
+        public string Role { get; set; } = default!; // "user", "assistant", "system"
+        public string Content { get; set; } = default!;
 
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 

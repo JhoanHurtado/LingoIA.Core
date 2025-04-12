@@ -15,5 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LingoIA.Application\LingoIA.Application.csproj" />
+    <ProjectReference Include="..\LingoIA.Infrastructure\LingoIA.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

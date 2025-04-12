@@ -1,12 +1,13 @@
 using AutoMapper;
 using LingoIA.Application.Dtos;
+using LingoIA.Application.Interfaces;
+using LingoIA.Application.Services.ContractsServices;
 using LingoIA.Application.Utils;
 using LingoIA.Domain.Entities;
-using LingoIA.Infrastructure.Interfaces;
 
 namespace LingoIA.Application.Services;
 
-public class AuthService(IUserRepository userRepository, IMapper mapper)
+public class AuthService(IUserRepository userRepository, IMapper mapper): IAuthContract
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IMapper _mapper = mapper;
@@ -42,6 +43,13 @@ public class AuthService(IUserRepository userRepository, IMapper mapper)
             return null;
         var userDto = _mapper.Map<UserDto>(user);
         userDto.Token = JwtTokenGenerator.GenerateToken(user);
+        return userDto;
+    }
+
+    public async Task<UserDto?> getUserByIDAsync(Guid userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        var userDto = _mapper.Map<UserDto>(user);
         return userDto;
     }
 }

@@ -5,15 +5,15 @@ namespace LingoIA.Domain.models
     public class MessageAnalysis
     {
         [JsonPropertyName("original")]
-        public string? Original { get; set; }
+        public string Original { get; set; } = string.Empty;
 
         [JsonPropertyName("corrected")]
-        public string? Corrected { get; set; }
+        public string Corrected { get; set; } = string.Empty;
 
         [JsonPropertyName("explanation")]
         public string Explanation { get; set; } = string.Empty;
 
         [JsonPropertyName("score")]
-        public int Score { get; set; } = 10;
+        public decimal Score { get; set; } = 10;
     }
 }

@@ -1,26 +1,22 @@
 ﻿using LingoIA.Application.Interfaces;
-using LingoIA.Domain.Interfaces;
+using LingoIA.Application.Services.ContractsServices;
+using LingoIA.Domain.Entities;
 using LingoIA.Domain.models;
 
 namespace LingoIA.Application.Services
 {
-    public class LanguagePracticeService : ILanguagePracticeService
+    public class LanguagePracticeService(ILingoIAClient lingoIAClient) : ILanguagePracticeService
     {
-        private readonly ILingoIAClient _lingoIAClient;
+        private readonly ILingoIAClient _lingoIAClient = lingoIAClient;
 
-        public LanguagePracticeService(ILingoIAClient lingoIAClient)
+        public Task<string> StartConversationAsync(string language, string topic, string username)
         {
-            _lingoIAClient = lingoIAClient;
+            return _lingoIAClient.StartNewConversation(language, topic, username);
         }
 
-        public Task<string> StartConversationAsync(string language, string topic)
+        public Task<string> SendMessageAsync(string message, List<Dictionary<string, string>> historyMessage,string username)
         {
-            return _lingoIAClient.StartNewConversation(language, topic);
-        }
-
-        public Task<string> SendMessageAsync(string message)
-        {
-            return _lingoIAClient.SendMessage(message);
+            return _lingoIAClient.SendMessage(message, historyMessage, username);
         }
 
         public MessageAnalysis? GetLastAnalysis()
@@ -32,6 +28,8 @@ namespace LingoIA.Application.Services
         {
             _lingoIAClient.ResetConversation();
         }
+
+        public List<Dictionary<string, string>> GetMessageHistory() => _lingoIAClient.GetMessageHistory();
     }
 
 }

@@ -1,5 +1,5 @@
+using LingoIA.Application.Interfaces;
 using LingoIA.Domain.Entities;
-using LingoIA.Infrastructure.Interfaces;
 using LingoIA.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +14,11 @@ namespace LingoIA.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbContext.user.FirstOrDefaultAsync(u => u.Email.Equals(email));
+        }
+
+        public async Task<User?> GetByIdAsync(Guid userId)
+        {
+            return await _dbContext.user.FirstOrDefaultAsync(u => u.Id.Equals(userId)); 
         }
 
         public async Task<bool> saveAsync(User user)
